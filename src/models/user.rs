@@ -4,4 +4,5 @@ use serde::{Deserialize, Serialize};
 pub struct MemnixUser {
     pub id: i64,
     pub user_name: String,
+    pub discord_id: String,
 }
