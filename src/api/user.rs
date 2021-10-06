@@ -1,7 +1,4 @@
-use crate::models::user::MemnixUser;
-
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
-
 
 pub async fn fetch_user(url: String) -> Result<i8> {
     let echo_json: serde_json::Value = reqwest::get(&url).await?.json().await?;
