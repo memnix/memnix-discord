@@ -5,7 +5,7 @@ mod api;
 
 
 use dotenv::dotenv;
-use general::{ping::*, about::*, pong::*};
+use general::{ping::*, about::*, pong::*, card::*};
 
 use serenity::{
     async_trait,
@@ -33,7 +33,7 @@ impl EventHandler for Handler {
 }
 
 #[group]
-#[commands(ping, pong, about)]
+#[commands(ping, pong, about, card)]
 struct General;
 
 #[tokio::main]
