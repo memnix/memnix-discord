@@ -29,18 +29,23 @@ async fn card(ctx: &Context, msg: &Message) -> CommandResult {
     };
     let user_id = fetch_user(format!("http://127.0.0.1:1813/api/v1/user/discordid/{:?}", msg.author.id.0).to_string()).await.unwrap();
     let result: bool;
+    let result_int: i8;
     if (answer.parse::<f64>().is_ok() && answer.eq(&card.answer.replace("\"", "")))
     || (!answer.parse::<f64>().is_ok() && answer.to_lowercase().contains(&card.answer.replace("\"", "").to_lowercase())) {
         result = true;
+        result_int = 1;
         msg.channel_id.say(&ctx.http, format!("**Correct !**\n\nYour Answer: {}\nExpected Answer: {}", answer, card.answer.replace("\"", ""))).await?;
     } else {
        result = false;
+       result_int = 0;
+
        msg.channel_id.say(&ctx.http, format!("**Incorrect !**\n\nYour Answer: {}\nExpected Answer: {}", answer, card.answer.replace("\"", ""))).await?;
     }
     let revision = MemnixRevision {
         user_id: user_id,
         card_id: card.id,
         result: result,
+        result_int: result_int
     };
 
     let _ = post_revision("http://127.0.0.1:1813/api/v1/revision/new".to_string(), revision).await;
