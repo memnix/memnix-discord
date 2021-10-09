@@ -16,8 +16,9 @@ async fn card(ctx: &Context, msg: &Message) -> CommandResult {
     let question = card.question;
 
     msg.reply(ctx, format!("**Card #{:?}**\n\n> Question: *{:?}*", card.id, question.replace("\"", ""))).await?;
+    
 
-    let answer = match msg.channel_id.await_reply(&ctx).timeout(Duration::from_secs(60)).await {
+    let answer = match msg.channel_id.await_reply(&ctx).timeout(Duration::from_secs(60)).author_id(msg.author.id).await {
         Some (answer) =>  answer.content.clone(),
         None => {
             msg.channel_id
@@ -26,7 +27,6 @@ async fn card(ctx: &Context, msg: &Message) -> CommandResult {
             return Ok(());
         }
     };
-
     let user_id = fetch_user(format!("http://127.0.0.1:1813/api/v1/user/discordid/{:?}", msg.author.id.0).to_string()).await.unwrap();
     let result: bool;
     if (answer.parse::<f64>().is_ok() && answer.eq(&card.answer.replace("\"", "")))
