@@ -8,11 +8,11 @@ run_debug:
 run_release:
 	./target/release/memnix
 start_service:
-	sudo systemctl start memnix.service 
+	sudo systemctl start memnixbot.service 
 stop_service:
-	sudo systemctl stop memnix.service 
+	sudo systemctl stop memnixbot.service 
 status_service:
-	sudo systemctl status memnix.service
+	sudo systemctl status memnixbot.service
 restart_service:
-	sudo systemctl restart memnix.service 
+	sudo systemctl restart memnixbot.service 
 
