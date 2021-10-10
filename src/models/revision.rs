@@ -6,5 +6,4 @@ pub struct MemnixRevision {
     pub card_id: i8,
     pub result: bool,
     pub result_int: i8,
-    
 }

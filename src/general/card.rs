@@ -10,7 +10,9 @@ use crate::api::card::fetch_card;
 
 #[command]
 async fn card(ctx: &Context, msg: &Message) -> CommandResult {
-    let response = fetch_card("http://127.0.0.1:1813/api/debug/card".to_string()).await;
+    let user_id = fetch_user(format!("http://127.0.0.1:1813/api/v1/user/discordid/{:?}", msg.author.id.0).to_string()).await.unwrap();
+
+    let response = fetch_card(format!("http://127.0.0.1:1813/api/debug/user/{:?}/deck/1/next", user_id).to_string()).await;
     //TODO: Handle error
     let card = response.unwrap();
     let question = card.question;
@@ -27,7 +29,6 @@ async fn card(ctx: &Context, msg: &Message) -> CommandResult {
             return Ok(());
         }
     };
-    let user_id = fetch_user(format!("http://127.0.0.1:1813/api/v1/user/discordid/{:?}", msg.author.id.0).to_string()).await.unwrap();
     let result: bool;
     let result_int: i8;
     if (answer.parse::<f64>().is_ok() && answer.eq(&card.answer.replace("\"", "")))
