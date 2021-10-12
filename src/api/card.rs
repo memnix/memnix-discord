@@ -13,9 +13,9 @@ pub async fn fetch_card(url: String) -> Result<MemnixCard> {
 
     if echo_json["success"].to_string().parse::<bool>().unwrap() == true {
         memnixcard = MemnixCard {
-            question: echo_json["data"]["card_question"].to_string(),
-            answer: echo_json["data"]["card_answer"].to_string(),
-            id: echo_json["data"]["ID"].to_string().parse::<i8>().unwrap(),
+            question: echo_json["data"]["Card"]["card_question"].to_string(),
+            answer: echo_json["data"]["Card"]["card_answer"].to_string(),
+            id: echo_json["data"]["Card"]["ID"].to_string().parse::<i8>().unwrap(),
         };
     };
 
