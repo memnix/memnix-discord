@@ -2,10 +2,12 @@ mod general;
 mod utils;
 mod models;
 mod api;
+mod memnix;
 
 
 use dotenv::dotenv;
-use general::{ping::*, about::*, pong::*, card::*};
+use general::{ping::*, about::*, pong::*};
+use memnix::{card::*};
 
 use serenity::{
     async_trait,
@@ -33,8 +35,12 @@ impl EventHandler for Handler {
 }
 
 #[group]
-#[commands(ping, pong, about, card)]
+#[commands(ping, pong, about)]
 struct General;
+
+#[group]
+#[commands(card)]
+struct Memnix;
 
 #[tokio::main]
 async fn main() {
