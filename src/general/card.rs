@@ -19,7 +19,6 @@ async fn card(ctx: &Context, msg: &Message) -> CommandResult {
 
     msg.reply(ctx, format!("**Card #{:?}**\n\n> Question: *{:?}*", card.id, question.replace("\"", ""))).await?;
     
-
     let answer = match msg.channel_id.await_reply(&ctx).timeout(Duration::from_secs(60)).author_id(msg.author.id).await {
         Some (answer) =>  answer.content.clone(),
         None => {
