@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use super::card::MemnixCard;
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct MemnixMem {
     pub id: i8,
@@ -11,6 +13,7 @@ pub struct MemnixMem {
     pub efactor: f32,
     pub interval: i8,
     pub total: i8,
+    pub card: MemnixCard,
     // pub next_date: str
 
 }

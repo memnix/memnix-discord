@@ -7,7 +7,7 @@ use serenity::model::prelude::*;
 use serenity::prelude::*;
 
 
-use crate::api::card::fetch_card;
+use crate::api::card::{fetch_mem};
 
 #[command]
 async fn card(ctx: &Context, msg: &Message) -> CommandResult {
@@ -21,7 +21,7 @@ async fn card(ctx: &Context, msg: &Message) -> CommandResult {
     .await
     .unwrap();
 
-    let card = fetch_card(
+    let mem = fetch_mem(
         format!(
             "http://127.0.0.1:1813/api/debug/user/{:?}/deck/1/today",
             user_id
@@ -31,14 +31,14 @@ async fn card(ctx: &Context, msg: &Message) -> CommandResult {
     .await
     .unwrap();
 
-    if card.id == 0 {
+    if mem.card.id == 0 {
         msg.reply(ctx, 
             "You dont have more cards to play for today ! But if you want to keep playing, you can use ~next !")
             .await?;
         return Ok(())
     }
 
-    let _ = ask(ctx, msg, &card, user_id).await;
+    let _ = ask(ctx, msg, &mem.card, user_id).await;
     
     Ok(())
 }
