@@ -64,7 +64,7 @@ async fn main() {
     // Create the framework
     let framework = StandardFramework::new()
         .configure(|c| c.owners(owners).prefix("~"))
-        .group(&GENERAL_GROUP);
+        .group(&GENERAL_GROUP).group(&MEMNIX_GROUP);
 
     // Create a new instance of the Client, logging in as a bot. This will
     // automatically prepend your bot token with "Bot ", which is a requirement

@@ -10,11 +10,14 @@ use crate::api::card::fetch_card;
 
 #[command]
 async fn card(ctx: &Context, msg: &Message) -> CommandResult {
-    let user_id = fetch_user(format!("http://127.0.0.1:1813/api/v1/user/discordid/{:?}", msg.author.id.0).to_string()).await.unwrap();
+    let user_id = fetch_user(format!("http://127.0.0.1:1813/api/v1/user/discord/{:?}", msg.author.id.0).to_string()).await.unwrap();
 
-    let response = fetch_card(format!("http://127.0.0.1:1813/api/debug/user/{:?}/deck/1/next", user_id).to_string()).await;
+    let mut card = fetch_card(format!("http://127.0.0.1:1813/api/debug/user/{:?}/deck/1/today", user_id).to_string()).await.unwrap();
     //TODO: Handle error
-    let card = response.unwrap();
+
+    if card.id == 0 {
+        card = fetch_card(format!("http://127.0.0.1:1813/api/debug/user/{:?}/deck/1/next", user_id).to_string()).await.unwrap();
+    }
     let question = card.question;
 
     msg.reply(ctx, format!("**Card #{:?}**\n\n> Question: *{:?}*", card.id, question.replace("\"", ""))).await?;
@@ -45,7 +48,8 @@ async fn card(ctx: &Context, msg: &Message) -> CommandResult {
         user_id: user_id,
         card_id: card.id,
         result: result,
-        result_int: result_int
+        result_int: result_int,
+        quality: 0
     };
 
     let _ = post_revision("http://127.0.0.1:1813/api/v1/revision/new".to_string(), revision).await;
