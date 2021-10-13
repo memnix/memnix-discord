@@ -3,6 +3,38 @@ use serenity::{client::Context, framework::standard::CommandResult, model::chann
 
 use crate::{api::revision::post_revision, models::{card::MemnixCard, revision::MemnixRevision}};
 
+async fn correct_embed(ctx: &Context,msg: &Message, card: &MemnixCard, answer: String )  -> CommandResult {
+    msg.channel_id.send_message(
+        ctx,
+        |m| {
+            m.embed(|e| {
+                e.color(Color::DARK_GREEN);
+                e.title("Correct");
+                e.description(format!("Your answer: {}\nExpected Answer: **{}**", answer, card.answer.replace("\"", "")
+            ));
+                e
+            })
+        }).await?;
+        
+    Ok(())
+}
+
+async fn incorrect_embed(ctx: &Context,msg: &Message, card: &MemnixCard, answer: String )  -> CommandResult {
+    msg.channel_id.send_message(
+        ctx,
+        |m| {
+            m.embed(|e| {
+                e.color(Color::DARK_RED);
+                e.title("Incorrect");
+                e.description(format!("Your answer: {}\nExpected Answer: **{}**", answer, card.answer.replace("\"", "")
+            ));
+                e
+            })
+        }).await?;
+        
+    Ok(())
+}
+
 
 async fn question_embed(ctx: &Context, msg: &Message, card: &MemnixCard) -> CommandResult {
 
@@ -50,30 +82,12 @@ pub async fn ask(ctx: &Context, msg: &Message, card: &MemnixCard, user_id: i8)->
     {
         result = true;
         result_int = 1;
-        msg.channel_id
-            .say(
-                &ctx.http,
-                format!(
-                    "**Correct !**\n\nYour Answer: {}\nExpected Answer: {}",
-                    answer,
-                    card.answer.replace("\"", "")
-                ),
-            )
-            .await?;
+        let _ = correct_embed(ctx, msg, card, answer).await;
     } else {
         result = false;
         result_int = 0;
 
-        msg.channel_id
-            .say(
-                &ctx.http,
-                format!(
-                    "**Incorrect !**\n\nYour Answer: {}\nExpected Answer: {}",
-                    answer,
-                    card.answer.replace("\"", "")
-                ),
-            )
-            .await?;
+        let _ = incorrect_embed(ctx, msg, card, answer).await;
     }
     let revision = MemnixRevision {
         user_id: user_id,
