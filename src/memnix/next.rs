@@ -1,17 +1,14 @@
-
-use crate::memnix::utils::{access_forbidden_embed, beta_embed};
-use crate::memnix::verifications::has_access;
 use crate::api::user::fetch_user;
 use crate::memnix::utils::ask;
+use crate::memnix::utils::{access_forbidden_embed, beta_embed};
+use crate::memnix::verifications::has_access;
 use crate::utils::constants::TEST_DECK;
-
 
 use serenity::framework::standard::{macros::command, CommandResult};
 use serenity::model::prelude::*;
 use serenity::prelude::*;
 
-
-use crate::api::mem::{fetch_mem};
+use crate::api::mem::fetch_mem;
 
 #[command]
 async fn next(ctx: &Context, msg: &Message) -> CommandResult {
@@ -27,15 +24,14 @@ async fn next(ctx: &Context, msg: &Message) -> CommandResult {
 
     if user_id == 0 {
         let _ = beta_embed(ctx, msg).await;
-        return Ok(())
+        return Ok(());
     }
 
     let access = has_access(user_id, TEST_DECK).await;
     if !access {
         let _ = access_forbidden_embed(ctx, msg).await;
         return Ok(());
-    }; 
-    
+    };
 
     let mem = fetch_mem(
         format!(
@@ -53,5 +49,3 @@ async fn next(ctx: &Context, msg: &Message) -> CommandResult {
 
     Ok(())
 }
-
-
