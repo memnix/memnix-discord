@@ -1,8 +1,10 @@
+use crate::models::{access::MemnixAccess};
+
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
 pub async fn fetch_access(url: String) ->  Result<MemnixAccess> {
     let echo_json: serde_json::Value = reqwest::get(&url).await?.json().await?;
-    let mut memnixcard = MemnixCard {
+    let mut memnixaccess = MemnixAccess {
         user_id: 0,
         deck_id: 0,
         permission: 0,
@@ -11,9 +13,9 @@ pub async fn fetch_access(url: String) ->  Result<MemnixAccess> {
 
     if echo_json["success"].to_string().parse::<bool>().unwrap() == true {
         memnixaccess = MemnixAccess {
-            id: echo_json["data"]["id"].to_string().parse::<i8>().unwrap(),
-            user_id: echo_json["data"]["user_id"].to_string().parse::<i8>().unwrap(),
-            deck_id: echo_json["data"]["deck_id"].to_string().parse::<i8>().unwrap(),
+            id: echo_json["data"]["ID"].to_string().parse::<u32>().unwrap(),
+            user_id: echo_json["data"]["user_id"].to_string().parse::<u32>().unwrap(),
+            deck_id: echo_json["data"]["deck_id"].to_string().parse::<u32>().unwrap(),
             permission: echo_json["data"]["permission"].to_string().parse::<i8>().unwrap(),  
         };
     };

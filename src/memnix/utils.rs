@@ -1,60 +1,93 @@
 use core::time::Duration;
-use serenity::{client::Context, framework::standard::CommandResult, model::channel::{Message}, utils::Color};
+use serenity::{
+    client::Context, framework::standard::CommandResult, model::channel::Message, utils::Color,
+};
 
-use crate::{api::revision::post_revision, models::{card::MemnixCard, revision::MemnixRevision}};
+use crate::{
+    api::revision::post_revision,
+    models::{card::MemnixCard, revision::MemnixRevision},
+};
 
-async fn correct_embed(ctx: &Context,msg: &Message, card: &MemnixCard, answer: String )  -> CommandResult {
+pub async fn access_forbidden_embed(ctx: &Context, msg: &Message) -> CommandResult {
     msg.channel_id.send_message(
         ctx,
         |m| {
+            m.embed(|e| {
+                e.color(Color::ROSEWATER);
+                e.title("Access !");
+                e.description("You don't have permission to play this deck !\n
+                If you think it's an error, contact Yume !\n\n
+                `Deck permission hasn't been implemented in this beta yet, you cannot subscribe to a new deck by yourself. Btw, if you've got a problem with this issue, you are free to help me by contributing to the code !`");
+                e
+            })
+        }).await?;
+    Ok(())
+}
+
+async fn correct_embed(
+    ctx: &Context,
+    msg: &Message,
+    card: &MemnixCard,
+    answer: String,
+) -> CommandResult {
+    msg.channel_id
+        .send_message(ctx, |m| {
             m.embed(|e| {
                 e.color(Color::DARK_GREEN);
                 e.title("Correct");
-                e.description(format!("Your answer: {}\nExpected Answer: **{}**", answer, card.answer.replace("\"", "")
-            ));
+                e.description(format!(
+                    "Your answer: {}\nExpected Answer: **{}**",
+                    answer,
+                    card.answer.replace("\"", "")
+                ));
                 e
             })
-        }).await?;
-        
+        })
+        .await?;
     Ok(())
 }
 
-async fn incorrect_embed(ctx: &Context,msg: &Message, card: &MemnixCard, answer: String )  -> CommandResult {
-    msg.channel_id.send_message(
-        ctx,
-        |m| {
+async fn incorrect_embed(
+    ctx: &Context,
+    msg: &Message,
+    card: &MemnixCard,
+    answer: String,
+) -> CommandResult {
+    msg.channel_id
+        .send_message(ctx, |m| {
             m.embed(|e| {
                 e.color(Color::DARK_RED);
                 e.title("Incorrect");
-                e.description(format!("Your answer: {}\nExpected Answer: **{}**", answer, card.answer.replace("\"", "")
-            ));
+                e.description(format!(
+                    "Your answer: {}\nExpected Answer: **{}**",
+                    answer,
+                    card.answer.replace("\"", "")
+                ));
                 e
             })
-        }).await?;
-        
+        })
+        .await?;
     Ok(())
 }
 
-
 async fn question_embed(ctx: &Context, msg: &Message, card: &MemnixCard) -> CommandResult {
-
-    msg.channel_id.send_message(
-        ctx,
-        |m| {
+    msg.channel_id
+        .send_message(ctx, |m| {
             m.embed(|e| {
                 e.color(Color::BLURPLE);
                 e.title(format!("Card #{:?}", card.id));
-                e.description(format!("** {}**\n\nIf you don't know the answer, type : `idk`", card.question));
+                e.description(format!(
+                    "** {}**\n\nIf you don't know the answer, type : `idk`",
+                    card.question
+                ));
                 e
             })
-        }).await?;
-        
+        })
+        .await?;
     Ok(())
 }
 
-
-pub async fn ask(ctx: &Context, msg: &Message, card: &MemnixCard, user_id: u32)-> CommandResult {
-
+pub async fn ask(ctx: &Context, msg: &Message, card: &MemnixCard, user_id: u32) -> CommandResult {
     let _ = question_embed(ctx, msg, card).await;
 
     let answer = match msg
