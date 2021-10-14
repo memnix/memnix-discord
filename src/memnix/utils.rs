@@ -24,7 +24,6 @@ pub async fn beta_embed(ctx: &Context, msg: &Message) -> CommandResult {
     Ok(())
 }
 
-
 pub async fn access_forbidden_embed(ctx: &Context, msg: &Message) -> CommandResult {
     msg.channel_id.send_message(
         ctx,
@@ -42,12 +41,7 @@ pub async fn access_forbidden_embed(ctx: &Context, msg: &Message) -> CommandResu
     Ok(())
 }
 
-async fn correct_embed(
-    ctx: &Context,
-    msg: &Message,
-    card: &MemnixCard,
-    answer: String,
-) -> CommandResult {
+async fn correct_embed(ctx: &Context ,msg: &Message, card: &MemnixCard, answer: String) -> CommandResult {
     msg.channel_id
         .send_message(ctx, |m| {
             m.embed(|e| {
@@ -65,12 +59,7 @@ async fn correct_embed(
     Ok(())
 }
 
-async fn incorrect_embed(
-    ctx: &Context,
-    msg: &Message,
-    card: &MemnixCard,
-    answer: String,
-) -> CommandResult {
+async fn incorrect_embed(ctx: &Context, msg: &Message, card: &MemnixCard, answer: String) -> CommandResult {
     msg.channel_id
         .send_message(ctx, |m| {
             m.embed(|e| {
@@ -93,11 +82,18 @@ async fn question_embed(ctx: &Context, msg: &Message, card: &MemnixCard) -> Comm
         .send_message(ctx, |m| {
             m.embed(|e| {
                 e.color(Color::BLURPLE);
+                if !&card.image_url.contains("none") {
+                    e.image(&card.image_url.replace("\"", ""));
+                }
+
                 e.title(format!("Card #{:?}", card.id));
                 e.description(format!(
                     "** {}**\n\nIf you don't know the answer, type : `idk`",
-                    card.question
+                    card.question.replace("\"", "")
                 ));
+                if !&card.card_type.contains("none") {
+                    e.footer(|f| f.text(&card.card_type.replace("\"", "")));
+                };
                 e
             })
         })
