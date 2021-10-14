@@ -53,7 +53,7 @@ async fn question_embed(ctx: &Context, msg: &Message, card: &MemnixCard) -> Comm
 }
 
 
-pub async fn ask(ctx: &Context, msg: &Message, card: &MemnixCard, user_id: i8)-> CommandResult {
+pub async fn ask(ctx: &Context, msg: &Message, card: &MemnixCard, user_id: u32)-> CommandResult {
 
     let _ = question_embed(ctx, msg, card).await;
 

@@ -44,7 +44,7 @@ pub async fn fetch_mem(url: String) -> Result<MemnixMem> {
     if echo_json["success"].to_string().parse::<bool>().unwrap() == true {
 
         memnixmem = MemnixMem {
-            id: echo_json["data"]["ID"].to_string().parse::<i8>().unwrap(),
+            id: echo_json["data"]["ID"].to_string().parse::<u32>().unwrap(),
             quality: echo_json["data"]["quality"].to_string().parse::<i8>().unwrap(),
             repetition: echo_json["data"]["repetition"].to_string().parse::<i8>().unwrap(),
             efactor:echo_json["data"]["e_factor"].to_string().parse::<f32>().unwrap(),
@@ -53,7 +53,7 @@ pub async fn fetch_mem(url: String) -> Result<MemnixMem> {
             card: MemnixCard {
                 question: echo_json["data"]["Card"]["card_question"].to_string(),
                 answer: echo_json["data"]["Card"]["card_answer"].to_string(),
-                id: echo_json["data"]["Card"]["ID"].to_string().parse::<i8>().unwrap(),
+                id: echo_json["data"]["Card"]["ID"].to_string().parse::<u32>().unwrap(),
             },
         };
     };
