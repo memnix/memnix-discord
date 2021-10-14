@@ -4,7 +4,6 @@ use super::card::MemnixCard;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct MemnixMem {
-    pub id: u32,
     //pub user_id: i8,
     //pub card_id: i8,
     //pub deck_id: i8,

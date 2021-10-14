@@ -16,7 +16,6 @@ pub async fn post_mem(url: String, mem: MemnixMem) -> Result<()> {
 
 pub async fn fetch_mem(url: String) -> Result<MemnixMem> {
     let mut memnixmem: MemnixMem = MemnixMem {
-        id: 0,
         quality: 0,
         repetition: 0,
         efactor: 0.0,
@@ -34,7 +33,6 @@ pub async fn fetch_mem(url: String) -> Result<MemnixMem> {
     if echo_json["success"].to_string().parse::<bool>().unwrap() == true {
 
         memnixmem = MemnixMem {
-            id: echo_json["data"]["ID"].to_string().parse::<u32>().unwrap(),
             quality: echo_json["data"]["quality"].to_string().parse::<i8>().unwrap(),
             repetition: echo_json["data"]["repetition"].to_string().parse::<i8>().unwrap(),
             efactor:echo_json["data"]["e_factor"].to_string().parse::<f32>().unwrap(),

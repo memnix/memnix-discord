@@ -1,6 +1,8 @@
 
 use crate::api::user::fetch_user;
-use crate::memnix::utils::ask;
+use crate::memnix::utils::{access_forbidden_embed, ask, beta_embed};
+use crate::memnix::verifications::has_access;
+use crate::utils::constants::TEST_DECK;
 
 use serenity::framework::standard::{macros::command, CommandResult};
 use serenity::model::prelude::*;
@@ -20,6 +22,17 @@ async fn card(ctx: &Context, msg: &Message) -> CommandResult {
     )
     .await
     .unwrap();
+
+    if user_id == 0 {
+        let _ = beta_embed(ctx, msg).await;
+        return Ok(())
+    }
+
+    let access = has_access(user_id, TEST_DECK).await;
+    if !access {
+        let _ = access_forbidden_embed(ctx, msg).await;
+        return Ok(());
+    }; 
 
     let mem = fetch_mem(
         format!(

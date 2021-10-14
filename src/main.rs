@@ -7,7 +7,7 @@ mod memnix;
 
 use dotenv::dotenv;
 use general::{ping::*, about::*, pong::*};
-use memnix::{card::*, next::*};
+use memnix::{card::*, next::*, deck::*};
 
 use serenity::{
     async_trait,
@@ -39,7 +39,7 @@ impl EventHandler for Handler {
 struct General;
 
 #[group]
-#[commands(card, next)]
+#[commands(card, next, subscribe)]
 struct Memnix;
 
 #[tokio::main]

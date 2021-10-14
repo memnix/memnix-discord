@@ -8,6 +8,23 @@ use crate::{
     models::{card::MemnixCard, revision::MemnixRevision},
 };
 
+pub async fn beta_embed(ctx: &Context, msg: &Message) -> CommandResult {
+    msg.channel_id.send_message(
+        ctx,
+        |m| {
+            m.embed(|e| {
+                e.color(Color::ROSEWATER);
+                e.title("Access !");
+                e.description("You don't have permission to use the bot as it's on beta mode only !\n
+                If you think it's an error, contact Yume !\n\n
+                If you want to become a beta tester, please contact Yume. If you don't know who the fuck is Yume, then that should be your starting point because you must know who is your god.");
+                e
+            })
+        }).await?;
+    Ok(())
+}
+
+
 pub async fn access_forbidden_embed(ctx: &Context, msg: &Message) -> CommandResult {
     msg.channel_id.send_message(
         ctx,
@@ -16,8 +33,9 @@ pub async fn access_forbidden_embed(ctx: &Context, msg: &Message) -> CommandResu
                 e.color(Color::ROSEWATER);
                 e.title("Access !");
                 e.description("You don't have permission to play this deck !\n
+                If you want to play this deck, use the following command: `~subscribe~`
                 If you think it's an error, contact Yume !\n\n
-                `Deck permission hasn't been implemented in this beta yet, you cannot subscribe to a new deck by yourself. Btw, if you've got a problem with this issue, you are free to help me by contributing to the code !`");
+                `Deck permission hasn't been fully implemented in this beta yet. If you encounter any problem, contact Yume ASAP`");
                 e
             })
         }).await?;
