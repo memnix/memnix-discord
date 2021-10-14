@@ -1,4 +1,5 @@
-use crate::models::{card::MemnixCard, mem::MemnixMem};
+/*use crate::models::{card::MemnixCard, mem::MemnixMem};
+
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
@@ -22,5 +23,5 @@ pub async fn fetch_card(url: String) -> Result<MemnixCard> {
 
     Ok(memnixcard)
 }
-
+*/
 

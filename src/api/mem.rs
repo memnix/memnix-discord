@@ -2,6 +2,7 @@ use crate::models::{card::MemnixCard, mem::MemnixMem};
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
+/*
 pub async fn post_mem(url: String, mem: MemnixMem) -> Result<()> {
     let _: serde_json::Value = reqwest::Client::new()
         .post(url)
@@ -13,6 +14,7 @@ pub async fn post_mem(url: String, mem: MemnixMem) -> Result<()> {
 
     Ok(())
 }
+*/
 
 pub async fn fetch_mem(url: String) -> Result<MemnixMem> {
     let mut memnixmem: MemnixMem = MemnixMem {

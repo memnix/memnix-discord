@@ -4,7 +4,7 @@ use crate::api::access::post_access;
 use crate::api::deck::fetch_deck;
 use crate::api::user::fetch_user;
 use crate::models::access::MemnixAccess;
-use crate::models::mem::MemnixMem;
+
 
 use serenity::framework::standard::{macros::command, CommandResult};
 use serenity::model::prelude::*;
