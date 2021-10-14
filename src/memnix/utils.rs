@@ -121,6 +121,7 @@ pub async fn ask(ctx: &Context, msg: &Message, card: &MemnixCard, user_id: u32) 
     };
     let result: bool;
     let result_int: i8;
+    let quality: i8;
     if (answer.parse::<f64>().is_ok() && answer.eq(&card.answer.replace("\"", "")))
         || (!answer.parse::<f64>().is_ok()
             && answer
@@ -129,10 +130,17 @@ pub async fn ask(ctx: &Context, msg: &Message, card: &MemnixCard, user_id: u32) 
     {
         result = true;
         result_int = 1;
+        quality = 4;
         let _ = correct_embed(ctx, msg, card, answer).await;
     } else {
         result = false;
         result_int = 0;
+
+        if answer.contains("idk") {
+            quality = 0;
+        } else {
+            quality = 3;
+        }
 
         let _ = incorrect_embed(ctx, msg, card, answer).await;
     }
@@ -141,7 +149,7 @@ pub async fn ask(ctx: &Context, msg: &Message, card: &MemnixCard, user_id: u32) 
         card_id: card.id,
         result: result,
         result_int: result_int,
-        quality: 0,
+        quality: quality,
     };
 
     let _ = post_revision(
