@@ -9,6 +9,6 @@ pub struct MemnixCard {
     pub card_type: String,
     //pub deck_id: i64,
     //pub tips: String,
-    //pub explication: String
+    pub explication: String
     
 }

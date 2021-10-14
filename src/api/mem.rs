@@ -29,6 +29,7 @@ pub async fn fetch_mem(url: String) -> Result<MemnixMem> {
             id: 0,
             image_url: "none".to_string(),
             card_type: "none".to_string(),
+            explication: "none".to_string(),
         }
     };
 
@@ -48,6 +49,7 @@ pub async fn fetch_mem(url: String) -> Result<MemnixMem> {
                 id: echo_json["data"]["Card"]["ID"].to_string().parse::<u32>().unwrap(),
                 image_url: echo_json["data"]["Card"]["image_url"].to_string(),
                 card_type: echo_json["data"]["Card"]["card_type"].to_string(),
+                explication: echo_json["data"]["Card"]["explication"].to_string(),
             },
         };
     };
