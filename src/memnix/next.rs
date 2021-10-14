@@ -11,7 +11,7 @@ use serenity::model::prelude::*;
 use serenity::prelude::*;
 
 
-use crate::api::card::{fetch_mem};
+use crate::api::mem::{fetch_mem};
 
 #[command]
 async fn next(ctx: &Context, msg: &Message) -> CommandResult {
