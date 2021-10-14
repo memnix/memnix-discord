@@ -33,7 +33,7 @@ pub async fn access_forbidden_embed(ctx: &Context, msg: &Message) -> CommandResu
                 e.color(Color::ROSEWATER);
                 e.title("Access !");
                 e.description("You don't have permission to play this deck !\n
-                If you want to play this deck, use the following command: `~subscribe~`
+                If you want to play this deck, use the following command: `~subscribe`
                 If you think it's an error, contact Yume !\n\n
                 `Deck permission hasn't been fully implemented in this beta yet. If you encounter any problem, contact Yume ASAP`");
                 e
