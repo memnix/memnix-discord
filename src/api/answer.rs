@@ -30,6 +30,7 @@ pub async fn fetch_answers(url: String) -> Result<Vec<MemnixAnswer>> {
     let mut array: Vec<MemnixAnswer> = Vec::new();
 
     if echo_json["success"].to_string().parse::<bool>().unwrap() == true {
+       if echo_json["count"].to_string().parse::<u32>().unwrap() >= 3 {
         for x in 0..echo_json["count"].to_string().parse::<u32>().unwrap() {
             let memnixanswer = MemnixAnswer {
                 card_id: echo_json["data"][x.to_string().parse::<usize>().unwrap()]["card_id"]
@@ -38,7 +39,7 @@ pub async fn fetch_answers(url: String) -> Result<Vec<MemnixAnswer>> {
             };
             array.push(memnixanswer);
         }
+        };
     };
-
     Ok(array)
 }
