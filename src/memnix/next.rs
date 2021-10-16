@@ -41,7 +41,7 @@ async fn next(ctx: &Context, msg: &Message) -> CommandResult {
         .to_string(),
     )
     .await
-    .unwrap();
+    .unwrap(); 
 
     //TODO: Handle error
 

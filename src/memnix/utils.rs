@@ -1,12 +1,11 @@
+use rand::{Rng, seq::SliceRandom};
+use rand::thread_rng;
 use core::time::Duration;
 use serenity::{
     client::Context, framework::standard::CommandResult, model::channel::Message, utils::Color,
 };
 
-use crate::{
-    api::revision::post_revision,
-    models::{card::MemnixCard, revision::MemnixRevision},
-};
+use crate::{api::{answer::fetch_answers, revision::post_revision}, models::{answer::MemnixAnswer, card::MemnixCard, revision::MemnixRevision}};
 
 pub async fn beta_embed(ctx: &Context, msg: &Message) -> CommandResult {
     msg.channel_id.send_message(
@@ -41,7 +40,7 @@ pub async fn access_forbidden_embed(ctx: &Context, msg: &Message) -> CommandResu
     Ok(())
 }
 
-async fn correct_embed(ctx: &Context ,msg: &Message, card: &MemnixCard, answer: String) -> CommandResult {
+async fn correct_embed(ctx: &Context ,msg: &Message, answer: String, correct_answer: String) -> CommandResult {
     msg.channel_id
         .send_message(ctx, |m| {
             m.embed(|e| {
@@ -50,7 +49,7 @@ async fn correct_embed(ctx: &Context ,msg: &Message, card: &MemnixCard, answer: 
                 e.description(format!(
                     "Your answer: {}\nExpected Answer: **{}**",
                     answer,
-                    card.answer.replace("\"", "")
+                    correct_answer.replace("\"", "")
                 ));
                 e
             })
@@ -59,7 +58,7 @@ async fn correct_embed(ctx: &Context ,msg: &Message, card: &MemnixCard, answer: 
     Ok(())
 }
 
-async fn incorrect_embed(ctx: &Context, msg: &Message, card: &MemnixCard, answer: String) -> CommandResult {
+async fn incorrect_embed(ctx: &Context, msg: &Message, answer: String, correct_answer: String) -> CommandResult {
     msg.channel_id
         .send_message(ctx, |m| {
             m.embed(|e| {
@@ -68,7 +67,7 @@ async fn incorrect_embed(ctx: &Context, msg: &Message, card: &MemnixCard, answer
                 e.description(format!(
                     "Your answer: {}\nExpected Answer: **{}**",
                     answer,
-                    card.answer.replace("\"", "")
+                    correct_answer.replace("\"", "")
                 ));
                 e
             })
@@ -77,7 +76,7 @@ async fn incorrect_embed(ctx: &Context, msg: &Message, card: &MemnixCard, answer
     Ok(())
 }
 
-async fn question_embed(ctx: &Context, msg: &Message, card: &MemnixCard) -> CommandResult {
+async fn question_embed(ctx: &Context, msg: &Message, card: &MemnixCard, user_id: u32) -> CommandResult {
     msg.channel_id
         .send_message(ctx, |m| {
             m.embed(|e| {
@@ -98,40 +97,41 @@ async fn question_embed(ctx: &Context, msg: &Message, card: &MemnixCard) -> Comm
             })
         })
         .await?;
+
+        let _ = wait_answer(ctx, msg, card, card.answer.to_string(), user_id).await;
     Ok(())
 }
 
-pub async fn ask(ctx: &Context, msg: &Message, card: &MemnixCard, user_id: u32) -> CommandResult {
-    let _ = question_embed(ctx, msg, card).await;
-
+pub async fn wait_answer(ctx: &Context, msg: &Message, card: &MemnixCard, correct_answer: String, user_id: u32) -> CommandResult {
     let answer = match msg
-        .channel_id
-        .await_reply(&ctx)
-        .timeout(Duration::from_secs(60))
-        .author_id(msg.author.id)
-        .await
+    .channel_id
+    .await_reply(&ctx)
+    .timeout(Duration::from_secs(60))
+    .author_id(msg.author.id)
+    .await
     {
-        Some(answer) => answer.content.clone(),
-        None => {
-            msg.channel_id
-                .say(&ctx.http, "No answer within 60 seconds")
-                .await?;
-            return Ok(());
+    Some(answer) => answer.content.clone(),
+    None => {
+        msg.channel_id
+            .say(&ctx.http, "No answer within 60 seconds")
+            .await?;
+        return Ok(());
         }
     };
+
     let result: bool;
     let result_int: i8;
     let quality: i8;
-    if (answer.parse::<f64>().is_ok() && answer.eq(&card.answer.replace("\"", "")))
+    if (answer.parse::<f64>().is_ok() && answer.eq(&correct_answer.replace("\"", "")))
         || (!answer.parse::<f64>().is_ok()
             && answer
                 .to_lowercase()
-                .contains(&card.answer.replace("\"", "").to_lowercase()))
+                .contains(&correct_answer.replace("\"", "").to_lowercase()))
     {
         result = true;
         result_int = 1;
         quality = 4;
-        let _ = correct_embed(ctx, msg, card, answer).await;
+        let _ = correct_embed(ctx, msg, answer, correct_answer).await;
     } else {
         result = false;
         result_int = 0;
@@ -142,7 +142,7 @@ pub async fn ask(ctx: &Context, msg: &Message, card: &MemnixCard, user_id: u32) 
             quality = 3;
         }
 
-        let _ = incorrect_embed(ctx, msg, card, answer).await;
+        let _ = incorrect_embed(ctx, msg, answer, correct_answer).await;
     }
     let revision = MemnixRevision {
         user_id: user_id,
@@ -157,6 +157,65 @@ pub async fn ask(ctx: &Context, msg: &Message, card: &MemnixCard, user_id: u32) 
         revision,
     )
     .await;
+    
+    Ok(())
+}
+
+pub async fn ask_level1(ctx: &Context, msg: &Message, card: &MemnixCard, mut answers: Vec<MemnixAnswer>, user_id: u32) -> CommandResult {
+    let mut to_display: Vec<&MemnixAnswer> = Vec::new();
+
+    let answer = MemnixAnswer {
+        card_id: card.id,
+        answer: card.answer.to_string(),
+    };
+
+    answers.shuffle(&mut thread_rng());
+    for x in 0..3 {
+        to_display.push(answers.get(x).unwrap());
+    };
+    let index = thread_rng().gen_range(0..=3);
+    to_display.insert( index ,&answer);
+
+    msg.channel_id
+        .send_message(ctx, |m| {
+            m.embed(|e| {
+                e.color(Color::BLURPLE);
+                if !&card.image_url.contains("none") {
+                    e.image(&card.image_url.replace("\"", ""));
+                }
+
+                e.title(format!("Card #{:?}", card.id));
+                e.description(format!(
+                    "** {}**\n\nIf you don't know the answer, type : `idk`",
+                    card.question.replace("\"", "")
+                ));
+                e.field("1", to_display.get(0).unwrap().answer.replace("\"", ""), false);
+                e.field("2", to_display.get(1).unwrap().answer.replace("\"", ""), false);
+                e.field("3", to_display.get(2).unwrap().answer.replace("\"", ""), false);
+                e.field("4", to_display.get(3).unwrap().answer.replace("\"", ""), false);
+
+                if !&card.card_type.contains("none") {
+                    e.footer(|f| f.text(&card.card_type.replace("\"", "")));
+                };
+                e
+            })
+        })
+        .await?;
+
+        let _ = wait_answer(ctx, msg, card, (index+1).to_string(), user_id).await;
+           Ok(())
+     
+}
+
+pub async fn ask(ctx: &Context, msg: &Message, card: &MemnixCard, user_id: u32) -> CommandResult {
+    let answers = fetch_answers(format!("http://127.0.0.1:1813/api/v1/answer/card/{:?}", card.id)).await.unwrap();
+    
+    if answers.len() < 3 {
+    let _ = question_embed(ctx, msg, card, user_id).await;
+    } else {
+    let _ = ask_level1(ctx, msg, card, answers, user_id).await;
+
+    }
 
     Ok(())
 }
