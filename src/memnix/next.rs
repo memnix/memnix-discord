@@ -45,7 +45,7 @@ async fn next(ctx: &Context, msg: &Message) -> CommandResult {
 
     //TODO: Handle error
 
-    let _ = ask(ctx, msg, &mem.card, user_id).await;
+    let _ = ask(ctx, msg, &mem, user_id).await;
 
     Ok(())
 }

@@ -5,6 +5,7 @@ use serenity::{
     client::Context, framework::standard::CommandResult, model::channel::Message, utils::Color,
 };
 
+use crate::models::mem::MemnixMem;
 use crate::{api::{answer::fetch_answers, revision::post_revision}, models::{answer::MemnixAnswer, card::MemnixCard, revision::MemnixRevision}};
 
 pub async fn beta_embed(ctx: &Context, msg: &Message) -> CommandResult {
@@ -76,7 +77,7 @@ async fn incorrect_embed(ctx: &Context, msg: &Message, answer: String, correct_a
     Ok(())
 }
 
-async fn question_embed(ctx: &Context, msg: &Message, card: &MemnixCard, user_id: u32) -> CommandResult {
+async fn level3(ctx: &Context, msg: &Message, card: &MemnixCard, user_id: u32) -> CommandResult {
     msg.channel_id
         .send_message(ctx, |m| {
             m.embed(|e| {
@@ -98,25 +99,25 @@ async fn question_embed(ctx: &Context, msg: &Message, card: &MemnixCard, user_id
         })
         .await?;
 
-        let _ = wait_answer(ctx, msg, card, card.answer.to_string(), user_id).await;
+        let _ = wait_answer(ctx, msg, card, card.answer.to_string(), user_id, 3).await;
     Ok(())
 }
 
-pub async fn wait_answer(ctx: &Context, msg: &Message, card: &MemnixCard, correct_answer: String, user_id: u32) -> CommandResult {
+pub async fn wait_answer(ctx: &Context, msg: &Message, card: &MemnixCard, correct_answer: String, user_id: u32, level: u8) -> CommandResult {
     let answer = match msg
-    .channel_id
-    .await_reply(&ctx)
-    .timeout(Duration::from_secs(60))
-    .author_id(msg.author.id)
-    .await
+        .channel_id
+        .await_reply(&ctx)
+        .timeout(Duration::from_secs(60))
+        .author_id(msg.author.id)
+        .await
     {
-    Some(answer) => answer.content.clone(),
-    None => {
-        msg.channel_id
-            .say(&ctx.http, "No answer within 60 seconds")
-            .await?;
-        return Ok(());
-        }
+        Some(answer) => answer.content.clone(),
+        None => {
+            msg.channel_id
+                .say(&ctx.http, "No answer within 60 seconds")
+                .await?;
+            return Ok(());
+            }
     };
 
     let result: bool;
@@ -130,15 +131,21 @@ pub async fn wait_answer(ctx: &Context, msg: &Message, card: &MemnixCard, correc
     {
         result = true;
         result_int = 1;
-        quality = 4;
+        if level <=3 {
+            quality = 4;
+        } else {
+            quality = 5;
+        };
         let _ = correct_embed(ctx, msg, answer, correct_answer).await;
     } else {
         result = false;
         result_int = 0;
 
-        if answer.contains("idk") {
+        if answer.contains("idk")  {
             quality = 0;
-        } else {
+        } else if level == 1 {
+            quality = 1;
+        }else {
             quality = 3;
         }
 
@@ -195,27 +202,27 @@ pub async fn ask_level1(ctx: &Context, msg: &Message, card: &MemnixCard, mut ans
                 e.field("4", to_display.get(3).unwrap().answer.replace("\"", ""), false);
 
                 if !&card.card_type.contains("none") {
-                    e.footer(|f| f.text(&card.card_type.replace("\"", "")));
+                    e.footer(|f| f.text("Type the right number"));
                 };
                 e
             })
         })
         .await?;
 
-        let _ = wait_answer(ctx, msg, card, (index+1).to_string(), user_id).await;
+        let _ = wait_answer(ctx, msg, card, (index+1).to_string(), user_id, 1).await;
            Ok(())
-     
 }
 
-pub async fn ask(ctx: &Context, msg: &Message, card: &MemnixCard, user_id: u32) -> CommandResult {
-    let answers = fetch_answers(format!("http://127.0.0.1:1813/api/v1/answer/card/{:?}", card.id)).await.unwrap();
+pub async fn ask(ctx: &Context, msg: &Message, mem: &MemnixMem, user_id: u32) -> CommandResult {
     
-    if answers.len() < 3 {
-    let _ = question_embed(ctx, msg, card, user_id).await;
+    
+    if mem.total < 3 || mem.efactor <= 1.4 || mem.quality <= 1 || mem.repetition < 2 {
+        let answers = fetch_answers(format!("http://127.0.0.1:1813/api/v1/answer/card/{:?}", mem.card.id)).await.unwrap();
+    if answers.len() >= 3 {
+        let _ = ask_level1(ctx, msg, &mem.card, answers, user_id).await;
+        };
     } else {
-    let _ = ask_level1(ctx, msg, card, answers, user_id).await;
-
-    }
-
+        let _ = level3(ctx, msg, &mem.card, user_id).await;
+    };
     Ok(())
 }
