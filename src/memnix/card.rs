@@ -2,7 +2,7 @@
 use crate::api::user::fetch_user;
 use crate::memnix::utils::{access_forbidden_embed, ask, beta_embed};
 use crate::memnix::verifications::has_access;
-use crate::utils::constants::TEST_DECK;
+use crate::utils::constants::{TEST_DECK, URL};
 
 use serenity::framework::standard::{macros::command, CommandResult};
 use serenity::model::prelude::*;
@@ -15,7 +15,7 @@ use crate::api::mem::{fetch_mem};
 async fn card(ctx: &Context, msg: &Message) -> CommandResult {
     let user_id = fetch_user(
         format!(
-            "http://127.0.0.1:1813/api/v1/user/discord/{:?}",
+            "{:?}/v1/users/discord/{:?}", URL,
             msg.author.id.0
         )
         .to_string(),
@@ -36,8 +36,7 @@ async fn card(ctx: &Context, msg: &Message) -> CommandResult {
 
     let mem = fetch_mem(
         format!(
-            "http://127.0.0.1:1813/api/debug/user/{:?}/deck/1/today",
-            user_id
+            "{:?}/v1/mems/user/{:?}/deck/{:?}/today", URL, user_id, TEST_DECK
         )
         .to_string(),
     )

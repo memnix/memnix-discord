@@ -4,6 +4,7 @@ use crate::api::access::post_access;
 use crate::api::deck::fetch_deck;
 use crate::api::user::fetch_user;
 use crate::models::access::MemnixAccess;
+use crate::utils::constants::URL;
 
 
 use serenity::framework::standard::{macros::command, CommandResult};
@@ -14,7 +15,7 @@ use serenity::prelude::*;
 async fn subscribe(ctx: &Context, msg: &Message) -> CommandResult {
     let user_id = fetch_user(
         format!(
-            "http://127.0.0.1:1813/api/v1/user/discord/{:?}",
+            "{:?}/v1/users/discord/{:?}", URL,
             msg.author.id.0
         )
         .to_string()
@@ -48,9 +49,8 @@ async fn subscribe(ctx: &Context, msg: &Message) -> CommandResult {
             return Ok(());
     };
 
-    let deck = fetch_deck(format!("http://127.0.0.1:1813/api/v1/deck/id/{:?}", answer.parse::<u32>().unwrap())).await.unwrap();
+    let deck = fetch_deck(format!("{:?}/v1/decks/id/{:?}",URL, answer.parse::<u32>().unwrap())).await.unwrap();
     if deck.id == 0 || deck.private {
-        println!("http://127.0.0.1:1813/api/v1/deck/id/{:?}", answer.parse::<u32>());
         msg.channel_id
         .say(&ctx.http, format!("This deck ID {:?} hasn't been found or you don't have access to this deck (it might be private)", answer))
         .await?;
@@ -63,7 +63,7 @@ async fn subscribe(ctx: &Context, msg: &Message) -> CommandResult {
         permission: 1 
     };
 
-    let _ = post_access("http://127.0.0.1:1813/api/v1/access/new".to_string(), access).await;
+    let _ = post_access(format!("{:?}/v1/accesses/new", URL), access).await;
     
 
     msg.channel_id
