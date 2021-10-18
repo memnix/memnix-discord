@@ -4,6 +4,7 @@ use crate::models::answer::MemnixAnswer;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
+/*
 pub async fn fetch_answer(url: String) -> Result<MemnixAnswer> {
     let echo_json: serde_json::Value = reqwest::get(&url).await?.json().await?;
     let mut memnixanswer = MemnixAnswer {
@@ -22,7 +23,7 @@ pub async fn fetch_answer(url: String) -> Result<MemnixAnswer> {
     };
 
     Ok(memnixanswer)
-}
+} */
 
 pub async fn fetch_answers(url: String) -> Result<Vec<MemnixAnswer>> {
     let echo_json: serde_json::Value = reqwest::get(&url).await?.json().await?;
