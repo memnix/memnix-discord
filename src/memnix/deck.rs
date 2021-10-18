@@ -50,7 +50,7 @@ async fn subscribe(ctx: &Context, msg: &Message) -> CommandResult {
     };
 
     let deck = fetch_deck(format!("{:?}/v1/decks/id/{:?}",URL, answer.parse::<u32>().unwrap())).await.unwrap();
-    if deck.id == 0 || deck.private {
+    if deck.id == 0 || deck.status < 2 {
         msg.channel_id
         .say(&ctx.http, format!("This deck ID {:?} hasn't been found or you don't have access to this deck (it might be private)", answer))
         .await?;

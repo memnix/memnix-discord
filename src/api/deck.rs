@@ -7,14 +7,14 @@ pub async fn fetch_deck(url: String) ->  Result<MemnixDeck> {
     let mut memnixdeck = MemnixDeck {
         id: 0,
         deck_name: "".to_string(),
-        private: false,
+        status: 0,
     };
 
     if echo_json["success"].to_string().parse::<bool>().unwrap() == true {
         memnixdeck = MemnixDeck {
             id: echo_json["data"]["ID"].to_string().parse::<u32>().unwrap(),
             deck_name: echo_json["data"]["deck_name"].to_string(),
-            private: echo_json["data"]["private"].to_string().parse::<bool>().unwrap(),
+            status: echo_json["data"]["status"].to_string().parse::<u32>().unwrap(),
         };
     };
 
