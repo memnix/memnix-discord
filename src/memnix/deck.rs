@@ -1,9 +1,6 @@
 use std::time::Duration;
 
-use crate::api::access::post_access;
-use crate::api::deck::fetch_deck;
-use crate::api::user::fetch_user;
-use crate::models::access::MemnixAccess;
+use crate::api::{deck::{fetch_deck, post_deck}, user::fetch_user};
 use crate::utils::constants::URL;
 
 
@@ -57,13 +54,7 @@ async fn subscribe(ctx: &Context, msg: &Message) -> CommandResult {
         return Ok(());
     };
 
-    let access = MemnixAccess {
-        user_id: user_id, 
-        deck_id: deck.id, 
-        permission: 1 
-    };
-
-    let _ = post_access(format!("{:?}/v1/accesses/new", URL), access).await;
+    let _ = post_deck(format!("{:?}/v1/decks/{:?}/user/{:?}/subscribe", URL, deck.id, user_id), deck).await;
     
 
     msg.channel_id

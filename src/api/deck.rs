@@ -20,3 +20,15 @@ pub async fn fetch_deck(url: String) ->  Result<MemnixDeck> {
 
     Ok(memnixdeck)
 }
+
+pub async fn post_deck(url: String, deck: MemnixDeck) -> Result<()> {
+    let _: serde_json::Value = reqwest::Client::new()
+        .post(url)
+        .json(&deck)
+        .send()
+        .await?
+        .json()
+        .await?;
+
+    Ok(())
+}

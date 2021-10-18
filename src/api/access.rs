@@ -21,7 +21,7 @@ pub async fn fetch_access(url: String) ->  Result<MemnixAccess> {
     Ok(memnixaccess)
 }
 
-
+/*
 pub async fn post_access(url: String, access: MemnixAccess) -> Result<()> {
     let _: serde_json::Value = reqwest::Client::new()
         .post(url)
@@ -33,3 +33,4 @@ pub async fn post_access(url: String, access: MemnixAccess) -> Result<()> {
 
     Ok(())
 }
+*/
