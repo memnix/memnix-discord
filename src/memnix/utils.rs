@@ -6,7 +6,6 @@ use serenity::{
 };
 
 use crate::models::mem::MemnixMem;
-use crate::utils::constants::URL;
 use crate::{api::{answer::fetch_answers, revision::post_revision}, models::{answer::MemnixAnswer, card::MemnixCard, revision::MemnixRevision}};
 
 pub async fn beta_embed(ctx: &Context, msg: &Message) -> CommandResult {
@@ -161,7 +160,7 @@ pub async fn wait_answer(ctx: &Context, msg: &Message, card: &MemnixCard, correc
     };
 
     let _ = post_revision(
-        format!("{:?}/v1/revisions/new", URL),
+        format!("http://127.0.0.1:1813/api/v1/revisions/new"),
         revision,
     )
     .await;
@@ -217,7 +216,7 @@ pub async fn ask_level1(ctx: &Context, msg: &Message, card: &MemnixCard, mut ans
 pub async fn ask(ctx: &Context, msg: &Message, mem: &MemnixMem, user_id: u32) -> CommandResult {
     
     if mem.total < 2 || mem.efactor <= 1.4 || mem.quality <= 1 || mem.repetition < 2 {
-        let answers = fetch_answers(format!("{:?}/v1/answers/card/{:?}",URL, mem.card.id)).await.unwrap();
+        let answers = fetch_answers(format!("http://127.0.0.1:1813/api/v1/answers/card/{:?}", mem.card.id)).await.unwrap();
         if answers.len() >= 3 {
             let _ = ask_level1(ctx, msg, &mem.card, answers, user_id).await;
         } else {
