@@ -21,6 +21,24 @@ pub async fn fetch_deck(url: String) ->  Result<MemnixDeck> {
     Ok(memnixdeck)
 }
 
+pub async fn fetch_decks(url: String) -> Result<Vec<MemnixDeck>> {
+    let echo_json: serde_json::Value = reqwest::get(&url).await?.json().await?;
+
+    let mut array: Vec<MemnixDeck> = Vec::new();
+
+    if echo_json["success"].to_string().parse::<bool>().unwrap() == true {
+        for x in 0..echo_json["count"].to_string().parse::<u32>().unwrap() {
+            let memnixdeck = MemnixDeck {
+                id: echo_json["data"][x.to_string().parse::<usize>().unwrap()]["ID"].to_string().parse::<u32>().unwrap(),
+                deck_name: echo_json["data"][x.to_string().parse::<usize>().unwrap()]["deck_name"].to_string(),
+                status: echo_json["data"][x.to_string().parse::<usize>().unwrap()]["status"].to_string().parse::<u32>().unwrap(),
+            };
+            array.push(memnixdeck);
+        }
+    };
+    Ok(array)
+}
+
 pub async fn post_deck(url: String, deck: MemnixDeck) -> Result<()> {
     let _: serde_json::Value = reqwest::Client::new()
         .post(url)

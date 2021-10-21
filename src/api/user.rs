@@ -32,7 +32,8 @@ pub async fn fetch_user(url: String) -> Result<MemnixUser> {
     Ok(user)
 }
 
-pub async fn fetch_selected_deck(url: String) -> Result<u32> {
+/*
+pub async fn fetch_selected_deck_id(url: String) -> Result<u32> {
     let echo_json: serde_json::Value = reqwest::get(&url).await?.json().await?;
     let id: u32;
     if echo_json["success"].to_string().parse::<bool>().unwrap() == true {
@@ -41,7 +42,7 @@ pub async fn fetch_selected_deck(url: String) -> Result<u32> {
         id = 0;
     }
     Ok(id)
-}
+}*/
 
 pub async fn put_user(url: String, user: MemnixUser) -> Result<()> {
     let _: serde_json::Value = reqwest::Client::new()

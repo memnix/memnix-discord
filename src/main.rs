@@ -39,7 +39,7 @@ impl EventHandler for Handler {
 struct General;
 
 #[group]
-#[commands(card, next, subscribe, deck)]
+#[commands(card, next, subscribe, deck, mydecks, decks)]
 struct Memnix;
 
 #[tokio::main]
