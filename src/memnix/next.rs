@@ -1,4 +1,4 @@
-use crate::api::user::fetch_user;
+use crate::api::user::{fetch_user_id};
 use crate::memnix::utils::ask;
 use crate::memnix::utils::{access_forbidden_embed, beta_embed};
 use crate::memnix::verifications::has_access;
@@ -12,7 +12,7 @@ use crate::api::mem::fetch_mem;
 
 #[command]
 async fn next(ctx: &Context, msg: &Message) -> CommandResult {
-    let user_id = fetch_user(
+    let user_id = fetch_user_id(
         format!(
             "http://127.0.0.1:1813/api/v1/users/discord/{:?}",
             msg.author.id.0
