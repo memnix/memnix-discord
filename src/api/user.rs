@@ -24,8 +24,8 @@ pub async fn fetch_user(url: String) -> Result<MemnixUser> {
     };
     if echo_json["success"].to_string().parse::<bool>().unwrap() == true {
         user.id = echo_json["data"]["ID"].to_string().parse::<u32>().unwrap();
-        user.user_name = echo_json["data"]["user_name"].to_string();
-        user.discord_id = echo_json["data"]["discord_id"].to_string();
+        user.user_name = echo_json["data"]["user_name"].to_string().replace("\"", "");
+        user.discord_id = echo_json["data"]["discord_id"].to_string().replace("\"", "");
         user.selected_deck = echo_json["data"]["selected_deck"].to_string().parse::<u32>().unwrap();
     };
 
